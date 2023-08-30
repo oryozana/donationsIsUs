@@ -1,3 +1,5 @@
+import AI
+
 from server import Server
 import Consts
 def main():

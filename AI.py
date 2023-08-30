@@ -1,4 +1,6 @@
 # imports
+from os.path import exists
+
 import pandas as pd
 import statistics
 from sklearn.preprocessing import LabelEncoder
@@ -13,10 +15,23 @@ import xgboost as xgb
 AI_MODEL_NAME = "model.json"
 
 
+def train_ai_model_if_needed() -> None:
+    """
+    Train an AI model if needed.
+    :return: None
+    """
+
+    def is_ai_trained() -> bool:
+        return exists(AI_MODEL_NAME)
+
+    if not is_ai_trained():
+        train_ai_model()
+
+
 def train_ai_model():
     def data_preprocessing():
         data = pd.read_csv("train_data.csv")
-        data = data.drop("", axis=1)
+        data = data.drop("Ethnicity", axis=1)
         min_max_scaler(data.dropna())
 
     def min_max_scaler(data):
@@ -34,7 +49,6 @@ def train_ai_model():
         data['MaritalStatus'] = l.fit_transform(data['MaritalStatus'])
         data['Occupation'] = l.fit_transform(data['Occupation'])
         data['Relationship'] = l.fit_transform(data['Relationship'])
-        data['Ethnicity'] = l.fit_transform(data['Ethnicity'])
         data['Gender'] = l.fit_transform(data['Gender'])
         data['CountryOfOrigin'] = l.fit_transform(data['CountryOfOrigin'])
         data.head()
@@ -62,34 +76,43 @@ def train_ai_model():
     data_preprocessing()
 
 
+def does_earn_more_than_7000_dollars():
+    def data_preprocessing():
+        test_data = pd.read_csv("test_data.csv")
+        test_data = test_data.drop("Ethnicity", axis=1)
+        return min_max_scaler(test_data)
+
+    def min_max_scaler(test_data):
+        scaler = MinMaxScaler()
+        for i in test_data.select_dtypes(include=np.number).columns.tolist():
+            col = np.array(test_data[i]).reshape(-1, 1)
+            scaler.fit(col)
+            test_data[i] = scaler.transform(col)
+        return label_encoder(test_data)
+
+    def label_encoder(test_data):
+        l = LabelEncoder()
+        test_data['WorkingCondition'] = l.fit_transform(test_data['WorkingCondition'])
+        test_data['Education'] = l.fit_transform(test_data['Education'])
+        test_data['MaritalStatus'] = l.fit_transform(test_data['MaritalStatus'])
+        test_data['Occupation'] = l.fit_transform(test_data['Occupation'])
+        test_data['Relationship'] = l.fit_transform(test_data['Relationship'])
+        test_data['Gender'] = l.fit_transform(test_data['Gender'])
+        test_data['CountryOfOrigin'] = l.fit_transform(test_data['CountryOfOrigin'])
+        test_data.head()
+        return test_the_model(test_data)
+
+    def test_the_model(test_data):
+        dtest = xgb.DMatrix(test_data.values)
+
+        model = xgb.Booster()
+        model.load_model(AI_MODEL_NAME)
+
+        y_pred = model.predict(dtest)
+
+        return round(y_pred[0]) == 1
+
+    return data_preprocessing()
 
 
-
-
-# test_data = pd.read_csv("test_data.csv")
-# num_cols = test_data.select_dtypes(include=np.number).columns.tolist()
-#
-# scaler = MinMaxScaler()
-# for i in num_cols:
-#   col = np.array(test_data[i]).reshape(-1, 1)
-#   scaler.fit(col)
-#   test_data[i] = scaler.transform(col)
-#
-# l = LabelEncoder()
-# test_data['WorkingCondition'] = l.fit_transform(test_data['WorkingCondition'])
-# test_data['Education'] = l.fit_transform(test_data['Education'])
-# test_data['MaritalStatus'] = l.fit_transform(test_data['MaritalStatus'])
-# test_data['Occupation'] = l.fit_transform(test_data['Occupation'])
-# test_data['Relationship'] = l.fit_transform(test_data['Relationship'])
-# test_data['Ethnicity'] = l.fit_transform(test_data['Ethnicity'])
-# test_data['Gender'] = l.fit_transform(test_data['Gender'])
-# test_data['CountryOfOrigin'] = l.fit_transform(test_data['CountryOfOrigin'])
-# test_data.head()
-#
-# dtest = xgb.DMatrix(test_data.values)
-#
-# y_pred = model.predict(dtest)
-#
-# id = pd.read_csv('test_data.csv')['Id'].values
-# df = pd.DataFrame({'id': id, 'MonthlyIncome': y_pred})
-# df.to_csv('predictions.csv', index=False)
+train_ai_model_if_needed()
