@@ -1,16 +1,14 @@
 # imports
 from os.path import exists
-
 import pandas as pd
-import statistics
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import roc_auc_score
 import xgboost as xgb
+
+import Consts
 
 AI_MODEL_NAME = "model.json"
 
@@ -78,7 +76,7 @@ def train_ai_model():
 
 def does_earn_more_than_7000_dollars():
     def data_preprocessing():
-        test_data = pd.read_csv("test_data.csv")
+        test_data = pd.concat([pd.read_csv(Consts.TEST_FILE_NAME), pd.read_csv("test_data.csv")])
         test_data = test_data.drop("Ethnicity", axis=1)
         return min_max_scaler(test_data)
 
