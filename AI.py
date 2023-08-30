@@ -30,6 +30,7 @@ def train_ai_model():
     def data_preprocessing():
         data = pd.read_csv("train_data.csv")
         data = data.drop("Ethnicity", axis=1)
+        data = data.drop("FinalWeight", axis=1)
         min_max_scaler(data.dropna())
 
     def min_max_scaler(data):
@@ -78,6 +79,7 @@ def does_earn_more_than_7000_dollars():
     def data_preprocessing():
         test_data = pd.concat([pd.read_csv(Consts.TEST_FILE_NAME), pd.read_csv("test_data.csv")])
         test_data = test_data.drop("Ethnicity", axis=1)
+        test_data = test_data.drop("FinalWeight", axis=1)
         return min_max_scaler(test_data)
 
     def min_max_scaler(test_data):
