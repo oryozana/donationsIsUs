@@ -18,5 +18,21 @@ def insert_database(id, age, working_condition, final_weight,
     df.to_csv(Consts.TEST_FILE_NAME, index=False, header=True)
 
 
-insert_database(25580, 27, "Private", 159623, "College", 10, "MarriedCivilianSpouse", "Sales", "Husband", "White",
-                "Male", 0, 0, 40, "United-States")
+def convert_data(data_string):
+    list_of_data = data_string.split(",")
+    list_of_data[0] = int(list_of_data[0])
+    list_of_data[1] = int(list_of_data[1])
+    list_of_data[3] = int(list_of_data[3])
+    list_of_data[5] = int(list_of_data[5])
+    list_of_data[11] = int(list_of_data[11])
+    list_of_data[12] = int(list_of_data[12])
+    list_of_data[13] = int(list_of_data[13])
+    print(type(list_of_data))
+    return list_of_data
+
+
+
+str1 = "18079,61,Private,119684,ProfessionalSchool,15,MarriedCivilianSpouse,ProfessionalSpecialty,Husband,White,Male,15024,0,20,United-States"
+data = convert_data(str1)
+
+
